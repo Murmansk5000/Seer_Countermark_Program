@@ -1,12 +1,22 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
+import javax.swing.SortOrder;
+
+
 
 public class CountermarkSelectionGUI extends JFrame {
     private Map<String, JCheckBox> attributeCheckBoxes;
+    private Map<String, JCheckBox> angleCheckBoxes;
+
     private JCheckBox showImagesCheckBox;
     private JButton confirmButton;
     private CountermarkList countermarkList;
@@ -18,8 +28,8 @@ public class CountermarkSelectionGUI extends JFrame {
 
     public CountermarkSelectionGUI() {
         countermarkList = new CountermarkList();
-        countermarkList.loadDataFromFile("countermark.txt"); // 确保文件路径正确
-        setTitle("刻印属性选择器");
+        countermarkList.loadDataFromFile("countermark.txt",this); // 确保文件路径正确
+        setTitle("刻印属性选择器——By Murmansk");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout()); // 修改布局为BorderLayout
 
@@ -37,8 +47,14 @@ public class CountermarkSelectionGUI extends JFrame {
         addCheckBox(attributePanel, "速度", "speed",true);
         addCheckBox(attributePanel, "体力", "healthPoints",true);
 
-        // 将属性复选框面板添加到主复选框面板
-        checkBoxPanel.add(attributePanel,BorderLayout.NORTH);
+
+        angleCheckBoxes = new HashMap<>();
+        JPanel anglePanel = new JPanel();
+        anglePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        addAngleBox(anglePanel, "5角", "5",true);
+        addAngleBox(anglePanel, "4角", "4",true);
+        addAngleBox(anglePanel, "3角", "3",true);
+        addAngleBox(anglePanel, "2角", "2",true);
 
         // 创建“显示图片”的复选框，并添加到复选框面板
         JPanel showImagesPanel = new JPanel();
@@ -46,14 +62,19 @@ public class CountermarkSelectionGUI extends JFrame {
         showImagesCheckBox = new JCheckBox("显示图片");
         showImagesPanel.add(showImagesCheckBox);
 
+        // 将属性复选框面板添加到主复选框面板
+        checkBoxPanel.add(attributePanel,BorderLayout.NORTH);
+
+        checkBoxPanel.add(anglePanel, BorderLayout.CENTER);
         // 将“显示图片”的面板添加到主复选框面板
-        checkBoxPanel.add(showImagesPanel, BorderLayout.CENTER);
+        checkBoxPanel.add(showImagesPanel, BorderLayout.SOUTH);
 
         // 将主复选框面板添加到窗体的北部
         add(checkBoxPanel, BorderLayout.NORTH);
 
         // 初始化表格和确认按钮
         initializeTable();
+        fillTableWithData(); // 确保这一行在initializeTable方法调用之后
 
         confirmButton = new JButton("确认");
         confirmButton.addActionListener(this::onConfirm);
@@ -73,7 +94,15 @@ public class CountermarkSelectionGUI extends JFrame {
         panel.add(checkBox);
     }
 
+    private void addAngleBox(JPanel panel, String label, String key, boolean isSelected) {
+        JCheckBox checkBox = new JCheckBox(label, isSelected);
+        angleCheckBoxes.put(key, checkBox);
+        panel.add(checkBox);
+    }
+
+
     private void onConfirm(ActionEvent event) {
+        System.out.println("Confirm button clicked!"); // 打印语句，确认方法被调用
         // 根据用户选择计算sumSelect
         countermarkList.calculateSumSelect(attributeCheckBoxes);
         // 调用排序方法
@@ -82,29 +111,43 @@ public class CountermarkSelectionGUI extends JFrame {
         // 将计算和排序后的数据填充到表格中
         fillTableWithData();
 
+        // 可选：如果需要在每次点击确认后都按照特定列排序
+        TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
+        sorter.setSortKeys(List.of(new RowSorter.SortKey(tableModel.getColumnCount() - 1, SortOrder.DESCENDING)));
+        sorter.sort();
+
         // 刷新表格显示
         table.revalidate();
         table.repaint();
     }
 
+
     private void fillTableWithData() {
-        // 清空表格现有数据
-        tableModel.setRowCount(0);
+        tableModel.setRowCount(0); // 清空现有数据
 
-        // 根据是否选中“显示图片”来决定是否加载图片
-        boolean loadImage = showImagesCheckBox.isSelected();
+        boolean anyAngleSelected = angleCheckBoxes.values().stream().anyMatch(JCheckBox::isSelected);
 
-        // 添加数据到表格
         for (Countermark cm : countermarkList.getCountermarks()) {
-            ImageIcon icon = null;
-            if (showImagesCheckBox.isSelected()) {
-                icon = getImageFromCache(cm);
+            boolean angleMatched = true; // 默认允许显示所有数据
+
+            if (anyAngleSelected) { // 如果至少有一个角数被选中，更新匹配逻辑
+                angleMatched = angleCheckBoxes.entrySet().stream()
+                        .filter(e -> e.getValue().isSelected()) // 筛选出被勾选的复选框
+                        .mapToInt(e -> Integer.parseInt(e.getKey())) // 转换为整数
+                        .anyMatch(angle -> angle == cm.getAngle()); // 检查是否有匹配
             }
-            Object[] rowData = {
+
+            if (!angleMatched) {
+                continue; // 如果没有匹配的角数，跳过当前Countermark
+            }
+
+            ImageIcon icon = showImagesCheckBox.isSelected() ? getImageFromCache(cm) : null;
+
+            tableModel.addRow(new Object[]{
                     cm.getId(),
                     cm.getAngle(),
                     cm.getName(),
-                    icon, // 如果未选中“显示图片”，则为null
+                    icon,
                     cm.getPhysicalAttack(),
                     cm.getSpecialAttack(),
                     cm.getDefence(),
@@ -113,13 +156,12 @@ public class CountermarkSelectionGUI extends JFrame {
                     cm.getHealthPoints(),
                     cm.getSumAll(),
                     cm.getSumSelect()
-            };
-            tableModel.addRow(rowData);
+            });
         }
 
-        // 如果不加载图片，可能需要调整行高以适应文本
-        adjustRowHeight(showImagesCheckBox.isSelected());
+        adjustRowHeight(showImagesCheckBox.isSelected()); // 调整行高
     }
+
 
     private ImageIcon getImageFromCache(Countermark cm) {
         // 尝试使用name命名的图片路径
@@ -163,10 +205,7 @@ public class CountermarkSelectionGUI extends JFrame {
     }
 
     private void initializeTable() {
-        int width = 50;
-        tableModel = new DefaultTableModel();
-        table = new JTable(tableModel);
-        table.setRowHeight(this.height);
+        int width = 60;
         tableModel = new DefaultTableModel() {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -176,7 +215,10 @@ public class CountermarkSelectionGUI extends JFrame {
                 return super.getColumnClass(columnIndex);
             }
         };
+
+        // 创建表格模型并设置给JTable
         table = new JTable(tableModel);
+        table.setRowHeight(60);
 
 
         // 设置表头
@@ -184,8 +226,8 @@ public class CountermarkSelectionGUI extends JFrame {
         tableModel.setColumnIdentifiers(columnNames);
         table.getColumnModel().getColumn(0).setPreferredWidth(width); // ID列
         table.getColumnModel().getColumn(1).setPreferredWidth(width); // 角数列
-        table.getColumnModel().getColumn(2).setPreferredWidth(100); // name
-        table.getColumnModel().getColumn(3).setPreferredWidth(100); // 图片
+        table.getColumnModel().getColumn(2).setPreferredWidth(2*width); // name
+        table.getColumnModel().getColumn(3).setPreferredWidth(2*width); // 图片
         table.getColumnModel().getColumn(4).setPreferredWidth(width); // 攻击
         table.getColumnModel().getColumn(5).setPreferredWidth(width); // 特攻
         table.getColumnModel().getColumn(6).setPreferredWidth(width); // 防御
@@ -193,8 +235,33 @@ public class CountermarkSelectionGUI extends JFrame {
         table.getColumnModel().getColumn(8).setPreferredWidth(width); // 速度
         table.getColumnModel().getColumn(9).setPreferredWidth(width); // 体力
         table.getColumnModel().getColumn(10).setPreferredWidth(width); // 总和
-        table.getColumnModel().getColumn(11).setPreferredWidth(width);
+        table.getColumnModel().getColumn(11).setPreferredWidth(2*width);
 
+        table.getColumnModel().getColumn(3).setCellRenderer(new ImageRenderer());
+
+        // 应用排序器到JTable
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(sorter);
+
+        // 默认按照ID升序排序
+        sorter.setSortKeys(List.of(new RowSorter.SortKey(0, SortOrder.ASCENDING)));
+
+
+        // 自定义单元格渲染器，用于文本居中和调整字体大小
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER); // 文字居中
+        centerRenderer.setFont(new Font("SansSerif", Font.BOLD, 36)); // 设置字体为36号
+
+
+        // 应用这个渲染器到所有文本列
+        int columnCount = tableModel.getColumnCount();
+        for (int i = 0; i < columnCount; i++) {
+            if (i != 3) { // 假设第4列是图片列，跳过这一列
+                table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+            }
+        }
+
+        // 设置图片列的渲染器，如果需要
         table.getColumnModel().getColumn(3).setCellRenderer(new ImageRenderer());
 
         // 将表格添加到ScrollPane，然后将其添加到窗体中
@@ -212,14 +279,11 @@ public class CountermarkSelectionGUI extends JFrame {
     }
     private void adjustRowHeight(boolean showImages) {
         if (!showImages) {
-            table.setRowHeight(20); // 示例值，适应没有图片时的高度
+            table.setRowHeight(30); // 示例值，适应没有图片时的高度
         } else {
             // 当显示图片时，可能需要一个更大的行高来适应图片
             // 这个值应该与resizeIcon方法中设置的图片高度相匹配
-            table.setRowHeight(this.height); // 假设this.height是合适的图片高度加上一些边距
+            table.setRowHeight(this.height);
         }
     }
-
-
-
 }

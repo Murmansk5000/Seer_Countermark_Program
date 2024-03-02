@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,9 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 
 public class CountermarkList {
     private ArrayList<Countermark> countermarks;
@@ -18,7 +16,7 @@ public class CountermarkList {
         this.countermarks = new ArrayList<>();
     }
 
-    public void loadDataFromFile(String fileName) {
+    public void loadDataFromFile(String fileName, Component parentComponent) {
         // 清空现有数据
         countermarks.clear();
 
@@ -50,8 +48,10 @@ public class CountermarkList {
                     System.out.println("Skipping malformed line: " + line);
                 }
             }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(parentComponent, "无法加载刻印数据文件: " + e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(parentComponent, "加载数据时发生未知错误: " + e.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
         }
     }
 

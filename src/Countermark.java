@@ -18,7 +18,6 @@ public class Countermark {
     public Countermark(int id, int angle, String name, int physicalAttack, int specialAttack,
                        int defence, int specialDefence, int speed, int healthPoints, String imagePath) {
         this.id = id;
-        this.angle = angle;
         this.name = name;
         this.physicalAttack = physicalAttack;
         this.specialAttack = specialAttack;
@@ -26,6 +25,7 @@ public class Countermark {
         this.specialDefence = specialDefence;
         this.speed = speed;
         this.healthPoints = healthPoints;
+        this.angle = calculateAngle();
         this.sumAll = calculateSumAll();
         this.sumSelect = 0; // Default value, can be set later based on selected attributes
         // 加载图片
@@ -68,8 +68,15 @@ public class Countermark {
         return angle;
     }
 
-    public void setAngle(int angle) {
-        this.angle = angle;
+    public int calculateAngle() {
+        int angle = 0;
+        if(this.getPhysicalAttack()>0) angle++;
+        if(this.getSpecialAttack()>0) angle++;
+        if(this.getDefence()>0) angle++;
+        if(this.getSpecialDefence()>0) angle++;
+        if(this.getSpeed()>0) angle++;
+        if(this.getHealthPoints()>0) angle++;
+        return angle;
     }
 
     public int getPhysicalAttack() {
