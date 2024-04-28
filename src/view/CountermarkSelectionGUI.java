@@ -6,8 +6,6 @@ import model.Countermark;
 import model.CountermarkList;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -24,13 +22,7 @@ public class CountermarkSelectionGUI extends JFrame {
     private final int width = 10;
     // 排序选项和组合框
     String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
-    private Map<String, JCheckBox> angleCheckBoxes;
-    private JCheckBox showImagesCheckBox;
     int sortTime = 6;
-    private JTable table;
-    private DefaultTableModel tableModel;
-    private JTextField searchField;
-    private JTextField filterTextField;
     JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
     String[] columnNames = {"ID", "角数", //"系列",
@@ -38,6 +30,12 @@ public class CountermarkSelectionGUI extends JFrame {
             "攻击", "特攻", "防御", "特防", "速度", "体力",
             "总和", "选项总和"};
     int[] columnWidth = new int[columnNames.length];
+    private Map<String, JCheckBox> angleCheckBoxes;
+    private JCheckBox showImagesCheckBox;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private JTextField searchField;
+    private JTextField filterTextField;
     private JButton searchButton;
     private int lastSearchIndex = -1; // 初始化为-1，表示开始时没有搜索过
     private Map<String, ImageIcon> imageCache = new HashMap<>();
@@ -200,7 +198,6 @@ public class CountermarkSelectionGUI extends JFrame {
     }
 
 
-
     // 全选按钮的事件处理方法
     private void selectCheckAll(ActionEvent event) {
         // 选中所有属性复选框
@@ -360,7 +357,7 @@ public class CountermarkSelectionGUI extends JFrame {
 
 
             // 若角数匹配，则将数据添加到表格中
-            if (angleMatched  && textMatched) {
+            if (angleMatched && textMatched) {
                 ImageIcon icon = ifLoadImage ? getImageFromCache(cm) : null;
                 Map<String, Object> rowData = new HashMap<>();
                 rowData.put("ID", cm.getId());

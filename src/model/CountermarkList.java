@@ -12,7 +12,7 @@ import java.util.*;
 public class CountermarkList {
     private ArrayList<Countermark> countermarks;
 
-    public CountermarkList(){
+    public CountermarkList() {
         this.countermarks = new ArrayList<>();
     }
 
@@ -22,7 +22,7 @@ public class CountermarkList {
 
         try {
             List<String> lines = Files.readAllLines(Paths.get(fileName));
-            for (int i = 1; i < lines.size();i++) {
+            for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
                 String[] data = line.split(","); // 假设您的文件是逗号分隔的
                 if (data.length == 11) { // 替换为您期望的字段数量

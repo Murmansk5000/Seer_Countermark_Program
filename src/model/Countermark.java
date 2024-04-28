@@ -67,12 +67,12 @@ public class Countermark {
 
     public int calculateAngle() {
         int angle = 0;
-        if(this.getPhysicalAttack()>0) angle++;
-        if(this.getSpecialAttack()>0) angle++;
-        if(this.getDefence()>0) angle++;
-        if(this.getSpecialDefence()>0) angle++;
-        if(this.getSpeed()>0) angle++;
-        if(this.getHealthPoints()>0) angle++;
+        if (this.getPhysicalAttack() > 0) angle++;
+        if (this.getSpecialAttack() > 0) angle++;
+        if (this.getDefence() > 0) angle++;
+        if (this.getSpecialDefence() > 0) angle++;
+        if (this.getSpeed() > 0) angle++;
+        if (this.getHealthPoints() > 0) angle++;
         return angle;
     }
 
@@ -114,12 +114,12 @@ public class Countermark {
         return sumSelect;
     }
 
-    public String getSeries() {
-        return series;
-    }
-
     public void setSumSelect(int sumSelect) {
         this.sumSelect = sumSelect;
+    }
+
+    public String getSeries() {
+        return series;
     }
 
     // Calculate the sum of all attributes
