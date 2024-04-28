@@ -6,6 +6,8 @@ import model.Countermark;
 import model.CountermarkList;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -28,6 +30,7 @@ public class CountermarkSelectionGUI extends JFrame {
     private JTable table;
     private DefaultTableModel tableModel;
     private JTextField searchField;
+    private JTextField filterTextField;
     JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
     String[] columnNames = {"ID", "角数", //"系列",
@@ -90,12 +93,13 @@ public class CountermarkSelectionGUI extends JFrame {
         JPanel right = new JPanel(new BorderLayout());
         JPanel checkBox = new JPanel(new BorderLayout());
 
-        left.add(createAttributePanel(), BorderLayout.NORTH);
-        left.add(createAnglePanel(), BorderLayout.CENTER);
+        checkBox.add(createAttributePanel(), BorderLayout.NORTH); // 属性面板
+        left.add(createAnglePanel(), BorderLayout.NORTH); // 选角面板
 
-        right.add(createShowImagesCheckBox(), BorderLayout.NORTH);
-        right.add(createSearchPanel(), BorderLayout.CENTER);
+        left.add(createShowImagesCheckBox(), BorderLayout.SOUTH); // 图片勾选框
+        right.add(createSearchPanel(), BorderLayout.CENTER); // 搜索框
 
+        right.add(createFilterPanel(), BorderLayout.NORTH); // 刻印名筛选
 
         checkBox.add(left, BorderLayout.WEST);
         checkBox.add(right, BorderLayout.EAST);
@@ -170,6 +174,23 @@ public class CountermarkSelectionGUI extends JFrame {
         return confirmButton;
     }
 
+    /**
+     * 创建并返回一个包含文本输入框的面板，用于输入过滤刻印的名称或系列。
+     *
+     * @return 配置好的过滤面板。
+     */
+    private JPanel createFilterPanel() {
+        JPanel filterPanel = new JPanel();  // 创建面板
+        filterPanel.setLayout(new FlowLayout(FlowLayout.LEFT));  // 设置布局
+
+        JLabel filterLabel = new JLabel("筛选刻印:");  // 创建标签
+        filterPanel.add(filterLabel);  // 将标签添加到面板
+        filterTextField = new JTextField(20);
+        filterPanel.add(filterTextField);  // 将文本框添加到面板
+
+        return filterPanel;
+    }
+
     // 配置窗口属性
     private void configureWindow() {
         pack();
@@ -177,6 +198,7 @@ public class CountermarkSelectionGUI extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
     }
+
 
 
     // 全选按钮的事件处理方法
@@ -232,7 +254,7 @@ public class CountermarkSelectionGUI extends JFrame {
         }
 
         lastSearchIndex = -1;
-        System.out.println("Confirm button clicked!"); // 打印语句，确认方法被调用
+//        System.out.println("Confirm button clicked!"); // 打印语句，确认方法被调用
         // 根据用户选择计算sumSelect
         countermarkList.calculateSumSelect(attributeCheckBoxes);
         // 调用排序方法
@@ -330,8 +352,15 @@ public class CountermarkSelectionGUI extends JFrame {
                     .mapToInt(e -> Integer.parseInt(e.getKey())) // 将复选框的key（字符串）转换为整数
                     .anyMatch(angle -> angle == cm.getAngle()); // 检查是否与Countermark的角数相匹配
 
+            String series = Optional.ofNullable(cm.getSeries()).orElse("");
+            String name = Optional.ofNullable(cm.getName()).orElse("");
+
+            boolean textMatched = name.toLowerCase().contains(filterTextField.getText()) ||
+                    series.toLowerCase().contains(filterTextField.getText());
+
+
             // 若角数匹配，则将数据添加到表格中
-            if (angleMatched) {
+            if (angleMatched  && textMatched) {
                 ImageIcon icon = ifLoadImage ? getImageFromCache(cm) : null;
                 Map<String, Object> rowData = new HashMap<>();
                 rowData.put("ID", cm.getId());
