@@ -1,3 +1,5 @@
+package model;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -9,6 +11,7 @@ import java.util.*;
 
 public class CountermarkList {
     private ArrayList<Countermark> countermarks;
+
     public CountermarkList(){
         this.countermarks = new ArrayList<>();
     }

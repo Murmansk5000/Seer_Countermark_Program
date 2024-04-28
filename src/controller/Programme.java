@@ -1,3 +1,7 @@
+package controller;
+
+import view.CountermarkSelectionGUI;
+
 import javax.swing.*;
 
 public class Programme {

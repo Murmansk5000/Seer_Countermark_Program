@@ -1,23 +1,116 @@
+package view;
+
+import model.Countermark;
+import model.CountermarkList;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Arrays;
 import java.util.Collections;
-import javax.swing.table.TableRowSorter;
-import javax.swing.SortOrder;
+import java.util.HashMap;
+import java.util.Map;
+
+class AnglePanel extends JPanel {
+    private Map<String, JCheckBox> angleCheckBoxes = new HashMap<>();
+    private JButton selectAngleButton;
+
+    public AnglePanel() {
+        setLayout(new FlowLayout(FlowLayout.LEFT));
+        selectAngleButton = new JButton("全选");
+        add(selectAngleButton);
+        addAngleBox("5角", "5", true);
+        addAngleBox("4角", "4", true);
+        addAngleBox("3角", "3", true);
+        addAngleBox("2角", "2", true);
+    }
+
+    public void addAngleBox(String label, String key, boolean isSelected) {
+        JCheckBox checkBox = new JCheckBox(label, isSelected);
+        angleCheckBoxes.put(key, checkBox);
+        add(checkBox);
+    }
+
+    public void selectAngleAll(ActionEvent event) {
+
+        // 选中所有角数复选框
+        for (JCheckBox checkBox : angleCheckBoxes.values()) {
+            checkBox.setSelected(true);
+        }
+    }
+
+}
+
+class AttributePanel extends JPanel {
+
+    private Map<String, JCheckBox> attributeCheckBoxes = new HashMap<>();
+    private JButton selectAttributeButton;
+
+    public AttributePanel() {
+        setLayout(new FlowLayout(FlowLayout.LEFT));
+        selectAttributeButton = new JButton("全选");
+        // 事件监听可以在外部设置，以便更灵活的控制
+        add(selectAttributeButton);
+        // 假设 addAttributeBox 方法从外部提供，或者在这里实现
+        addAttributeBox("攻击", "physicalAttack", true);
+        addAttributeBox("特攻", "specialAttack", true);
+        addAttributeBox("防御", "defence", true);
+        addAttributeBox("特防", "specialDefence", true);
+        addAttributeBox("速度", "speed", true);
+        addAttributeBox("体力", "healthPoints", true);
+    }
+
+    public void addAttributeBox(String label, String attributeKey, boolean isSelected) {
+        JCheckBox checkBox = new JCheckBox(label, isSelected);
+        attributeCheckBoxes.put(attributeKey, checkBox);
+        add(checkBox);
+    }
+
+    // 全选按钮的事件处理方法
+    public void selectCheckAll(ActionEvent event) {
+        // 选中所有属性复选框
+        for (JCheckBox checkBox : attributeCheckBoxes.values()) {
+            checkBox.setSelected(true);
+        }
+    }
+
+}
+
+class ConfirmPanel extends JPanel {
+    private JButton confirmButton = new JButton("确认");
+    private JCheckBox showImagesCheckBox = new JCheckBox("显示图片");
+
+    public ConfirmPanel() {
+        add(confirmButton);
+        add(showImagesCheckBox);
+    }
+}
+
+class SearchPanel extends JPanel {
+    private JTextField searchField = new JTextField(20);
+    private JButton searchButton = new JButton("搜索");
+
+    public SearchPanel() {
+        add(new JLabel("搜索刻印:"));
+        add(searchField);
+        add(searchButton);
+    }
 
 
+    public String getTxt() {
+        return searchField.getText().trim();
+    }
+}
 
 public class CountermarkSelectionGUI extends JFrame {
+    private final int height = 30;
+    private final int heightWithPic = 2 * height;
+    private final int width = 40;
     private Map<String, JCheckBox> attributeCheckBoxes;
     private Map<String, JCheckBox> angleCheckBoxes;
-
     private JCheckBox showImagesCheckBox;
     private JButton selectAttributeButton; // 新增的全选按钮
     private JButton selectAngleButton; // 新增的全选按钮
@@ -25,10 +118,6 @@ public class CountermarkSelectionGUI extends JFrame {
     private CountermarkList countermarkList;
     private JTable table;
     private DefaultTableModel tableModel;
-    private final int height = 30;
-    private final int heightWithPic = 2 * height;
-    private final int width = 40;
-
     private JTextField searchField;
     private JButton searchButton;
     private int lastSearchIndex = -1; // 初始化为-1，表示开始时没有搜索过
@@ -52,9 +141,9 @@ public class CountermarkSelectionGUI extends JFrame {
         JPanel attributePanel = new JPanel();
         attributePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         attributePanel.add(selectAttributeButton);
-        addAttributeBox(attributePanel, "攻击", "physicalAttack",true);
-        addAttributeBox(attributePanel, "特攻", "specialAttack",true);
-        addAttributeBox(attributePanel, "防御", "defence",true);
+        addAttributeBox(attributePanel, "攻击", "physicalAttack", true);
+        addAttributeBox(attributePanel, "特攻", "specialAttack", true);
+        addAttributeBox(attributePanel, "防御", "defence", true);
         addAttributeBox(attributePanel, "特防", "specialDefence", true);
         addAttributeBox(attributePanel, "速度", "speed", true);
         addAttributeBox(attributePanel, "体力", "healthPoints", true);
@@ -105,7 +194,7 @@ public class CountermarkSelectionGUI extends JFrame {
         add(confirmButton, BorderLayout.SOUTH); // 将确认按钮放置在窗口底部
 
         pack(); // 调整窗口以适应组件大小
-        setSize(800,600);
+        setSize(800, 600);
         setLocationRelativeTo(null); // 设置窗口居中显示
 
 
@@ -119,6 +208,7 @@ public class CountermarkSelectionGUI extends JFrame {
             checkBox.setSelected(true);
         }
     }
+
     private void selectAngleAll(ActionEvent event) {
 
         // 选中所有角数复选框
@@ -129,7 +219,7 @@ public class CountermarkSelectionGUI extends JFrame {
 
 
     private void addAttributeBox(JPanel panel, String label, String attributeKey, boolean isSelected) {
-        JCheckBox checkBox = new JCheckBox(label,isSelected);
+        JCheckBox checkBox = new JCheckBox(label, isSelected);
         attributeCheckBoxes.put(attributeKey, checkBox);
         panel.add(checkBox);
     }
@@ -240,7 +330,6 @@ public class CountermarkSelectionGUI extends JFrame {
     }
 
 
-
     private ImageIcon getImageFromCache(Countermark cm) {
         // 尝试使用name命名的图片路径
         String namePath = "img/" + cm.getName() + ".png";
@@ -277,7 +366,7 @@ public class CountermarkSelectionGUI extends JFrame {
     private ImageIcon loadImage(String path) {
         ImageIcon icon = new ImageIcon(path);
         if (icon.getIconWidth() > 0) {
-            return resizeIcon(icon, this.heightWithPic-10); // 假设有resizeIcon方法调整大小
+            return resizeIcon(icon, this.heightWithPic - 10); // 假设有resizeIcon方法调整大小
         }
         return null; // 图片加载失败
     }
@@ -359,6 +448,7 @@ public class CountermarkSelectionGUI extends JFrame {
         Image resizedImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
         return new ImageIcon(resizedImg);
     }
+
     private void adjustRowHeight(boolean showImages) {
         if (!showImages) {
             table.setRowHeight(this.height); // 示例值，适应没有图片时的高度

@@ -1,3 +1,5 @@
+package model;
+
 public enum Attribute {
     PHYSICAL_ATTACK("Physical Attack"),
     SPECIAL_ATTACK("Special Attack"),

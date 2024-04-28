@@ -1,3 +1,5 @@
+package model;
+
 import javax.swing.*;
 import java.io.File;
 import java.util.EnumMap;
@@ -69,6 +71,7 @@ public class Countermark {
             return null;
         }
     }
+
     public int getAngle() {
         return angle;
     }
