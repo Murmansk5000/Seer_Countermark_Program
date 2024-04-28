@@ -10,18 +10,13 @@ public class Countermark {
     private final String series;
     private final String name; // 名字
     private final EnumMap<Attribute, Integer> attributes;
-    //    private int physicalAttack; // 攻击
-//    private int specialAttack;// 特攻
-//    private int defence; //防御
-//    private int specialDefence;// 特防
-//    private int speed; // 速度
-//    private int healthPoints; // 体力
     private final int sumAll; // 总和
     private ImageIcon image; // 图片
     private int sumSelect; // 选项总和
 
     public Countermark(int id, int angle, String name, int physicalAttack, int specialAttack,
-                       int defence, int specialDefence, int speed, int healthPoints, String series, String imagePath) {
+                       int defence, int specialDefence, int speed, int healthPoints, String series,
+                       String imagePath) {
         this.id = id;
         this.name = name;
         this.attributes = new EnumMap<>(Attribute.class);
@@ -31,12 +26,6 @@ public class Countermark {
         attributes.put(Attribute.SPECIAL_DEFENCE, specialDefence);
         attributes.put(Attribute.SPEED, speed);
         attributes.put(Attribute.HEALTH_POINTS, healthPoints);
-//        this.physicalAttack = physicalAttack;
-//        this.specialAttack = specialAttack;
-//        this.defence = defence;
-//        this.specialDefence = specialDefence;
-//        this.speed = speed;
-//        this.healthPoints = healthPoints;
 
         this.series = series;
         this.angle = calculateAngle();
