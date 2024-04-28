@@ -75,11 +75,11 @@ public class CountermarkList {
     }
 
 
-    public int size(){
+    public int size() {
         return countermarks.size();
     }
 
-    public Countermark get(int i){
+    public Countermark get(int i) {
         return this.countermarks.get(i);
     }
 

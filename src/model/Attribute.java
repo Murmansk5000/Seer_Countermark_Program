@@ -1,20 +1,26 @@
 package model;
 
 public enum Attribute {
-    PHYSICAL_ATTACK("Physical Attack"),
-    SPECIAL_ATTACK("Special Attack"),
-    DEFENCE("Defence"),
-    SPECIAL_DEFENCE("Special Defence"),
-    SPEED("Speed"),
-    HEALTH_POINTS("Health Points");
+    PHYSICAL_ATTACK("攻击", "physicalAttack"),
+    SPECIAL_ATTACK("特攻", "specialAttack"),
+    DEFENCE("防御", "defence"),
+    SPECIAL_DEFENCE("特防", "specialDefence"),
+    SPEED("速度", "speed"),
+    HEALTH_POINTS("体力", "healthPoints");
 
-    private final String displayName;
+    private final String label;
+    private final String key;
 
-    Attribute(String displayName) {
-        this.displayName = displayName;
+    Attribute(String label, String key) {
+        this.label = label;
+        this.key = key;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getLabel() {
+        return label;
+    }
+
+    public String getKey() {
+        return key;
     }
 }

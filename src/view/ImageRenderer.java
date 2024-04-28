@@ -8,14 +8,15 @@ public class ImageRenderer extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         if (value instanceof ImageIcon) {
-            // value 是预期的 ImageIcon 实例
+            // 创建一个标签，并将图标设置为标签的图标
             JLabel label = new JLabel();
-            label.setHorizontalAlignment(JLabel.CENTER);
             label.setIcon((ImageIcon) value);
+            label.setHorizontalAlignment(JLabel.CENTER); // 居中显示
             return label;
         } else {
-            // 否则，使用默认的单元格渲染器
+            // 如果值不是ImageIcon类型，回退到默认的渲染器
             return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         }
     }
 }
+

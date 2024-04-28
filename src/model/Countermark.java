@@ -125,6 +125,10 @@ public class Countermark {
         return sumSelect;
     }
 
+    public String getSeries() {
+        return series;
+    }
+
     public void setSumSelect(int sumSelect) {
         this.sumSelect = sumSelect;
     }
