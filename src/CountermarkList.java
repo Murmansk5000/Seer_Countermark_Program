@@ -1,14 +1,11 @@
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import javax.swing.*;
+import java.util.*;
 
 public class CountermarkList {
     private ArrayList<Countermark> countermarks;
@@ -31,6 +28,8 @@ public class CountermarkList {
                     String namePath = "img/" + name + ".png";
                     String imagePath = new File(idPath).exists() ? idPath : (new File(namePath).exists() ? namePath : null);
 
+
+                    String series = null;
                     Countermark cm = new Countermark(
                             Integer.parseInt(data[0]), // id
                             Integer.parseInt(data[1]), // 角数
@@ -42,7 +41,7 @@ public class CountermarkList {
                             Integer.parseInt(data[6]), // 特防
                             Integer.parseInt(data[7]), // 速度
                             Integer.parseInt(data[8]), // 体力
-                            imagePath);
+                            series, imagePath);
                     countermarks.add(cm);
                 } else {
                     System.out.println("Skipping malformed line: " + line);
