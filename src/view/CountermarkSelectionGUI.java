@@ -22,9 +22,11 @@ public class CountermarkSelectionGUI extends JFrame {
     private final int width = 10;
     // 排序选项和组合框
     String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
-
+    JComboBox<String> filterCombos; //筛选某项数值大于
+    private JTextField valueField; // 筛选的数值
     JCheckBox checkPhysicalAttack;
     JCheckBox checkSpecialAttack;
+
     int sortTime = 6;
     JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
@@ -141,8 +143,17 @@ public class CountermarkSelectionGUI extends JFrame {
         JPanel attackPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         checkPhysicalAttack = new JCheckBox("只看物攻", true);
         checkSpecialAttack = new JCheckBox("只看特攻", true);
+        filterCombos = new JComboBox<>(sortOptions);
+        JLabel label = new JLabel("≥");
+
+        valueField = new JTextField("0",5);  // 设置为10列宽
+
         attackPanel.add(checkPhysicalAttack);
         attackPanel.add(checkSpecialAttack);
+        attackPanel.add(filterCombos);
+        attackPanel.add(label);
+        attackPanel.add(valueField);
+
         return attackPanel;
     }
 
@@ -343,62 +354,216 @@ public class CountermarkSelectionGUI extends JFrame {
         }
     }
 
+//    /**
+//     * 根据选定的过滤条件从Countermark列表中获取数据并填充表格。
+//     * 如果选择显示图片，将检查缓存或根据需要加载图片。
+//     */
+//    private void fillTableWithData() {
+//        tableModel.setRowCount(0); // 清空表格数据
+//        boolean ifLoadImage = showImagesCheckBox.isSelected();
+//
+//        // 遍历所有Countermark对象，根据勾选的角数筛选数据
+//        for (Countermark cm : countermarkList.getCountermarks()) {
+//            // 如果没有复选框被勾选，跳过当前迭代
+//            if (angleCheckBoxes.isEmpty() || angleCheckBoxes.values().stream().noneMatch(JCheckBox::isSelected)) {
+//                continue;
+//            }
+//
+//            // 检查Countermark对象的角数是否与任何被勾选的复选框相匹配
+//            boolean angleMatched = angleCheckBoxes.entrySet().stream()
+//                    .filter(e -> e.getValue().isSelected()) // 筛选出被勾选的复选框
+//                    .mapToInt(e -> Integer.parseInt(e.getKey())) // 将复选框的key（字符串）转换为整数
+//                    .anyMatch(angle -> angle == cm.getAngle()); // 检查是否与Countermark的角数相匹配
+//
+//            String series = Optional.ofNullable(cm.getSeries()).orElse("");
+//            String name = Optional.ofNullable(cm.getName()).orElse("");
+//
+//            boolean textMatched = name.toLowerCase().contains(filterTextField.getText()) ||
+//                    series.toLowerCase().contains(filterTextField.getText());
+//
+//            boolean attackValid = false;
+//            if (checkPhysicalAttack.isSelected() && cm.getPhysicalAttack() > 0) {
+//                attackValid = true;
+//            } else if (checkSpecialAttack.isSelected() && cm.getSpecialAttack() > 0) {
+//                attackValid = true;
+//            }
+//
+//            boolean valueMatched = true;
+//            String selectedFilter = (String) filterCombos.getSelectedItem();
+//            int filterValue = 0;
+//            try {
+//                filterValue = Integer.parseInt(valueField.getText());
+//            } catch (NumberFormatException e) {
+//                JOptionPane.showMessageDialog(this, "请输入有效的数字");
+//                return;
+//            }
+//
+//
+//
+//
+//
+//            // 若角数匹配，则将数据添加到表格中
+//            if (angleMatched && textMatched && attackValid) {
+//                ImageIcon icon = ifLoadImage ? getImageFromCache(cm) : null;
+//                Map<String, Object> rowData = new HashMap<>();
+//                rowData.put("ID", cm.getId());
+//                rowData.put("系列", cm.getSeries());
+//                rowData.put("角数", cm.getAngle());
+//                rowData.put("名称", cm.getName());
+//                rowData.put("图片", icon);
+//                rowData.put("攻击", cm.getPhysicalAttack());
+//                rowData.put("特攻", cm.getSpecialAttack());
+//                rowData.put("防御", cm.getDefence());
+//                rowData.put("特防", cm.getSpecialDefence());
+//                rowData.put("速度", cm.getSpeed());
+//                rowData.put("体力", cm.getHealthPoints());
+//                rowData.put("总和", cm.getSumAll());
+//                rowData.put("选项总和", cm.getSumSelect());
+//                addRowToTable(rowData);
+//            }
+//        }
+//        adjustRowHeight(ifLoadImage);
+//    }
+
+
     /**
-     * 根据选定的过滤条件从Countermark列表中获取数据并填充表格。
-     * 如果选择显示图片，将检查缓存或根据需要加载图片。
+     * 遍历Countermark列表，过滤并填充表格。
      */
     private void fillTableWithData() {
-        tableModel.setRowCount(0); // 清空表格数据
+        tableModel.setRowCount(0);
         boolean ifLoadImage = showImagesCheckBox.isSelected();
-
-        // 遍历所有Countermark对象，根据勾选的角数筛选数据
         for (Countermark cm : countermarkList.getCountermarks()) {
-            // 如果没有复选框被勾选，跳过当前迭代
-            if (angleCheckBoxes.isEmpty() || angleCheckBoxes.values().stream().noneMatch(JCheckBox::isSelected)) {
-                continue;
-            }
-
-            // 检查Countermark对象的角数是否与任何被勾选的复选框相匹配
-            boolean angleMatched = angleCheckBoxes.entrySet().stream()
-                    .filter(e -> e.getValue().isSelected()) // 筛选出被勾选的复选框
-                    .mapToInt(e -> Integer.parseInt(e.getKey())) // 将复选框的key（字符串）转换为整数
-                    .anyMatch(angle -> angle == cm.getAngle()); // 检查是否与Countermark的角数相匹配
-
-            String series = Optional.ofNullable(cm.getSeries()).orElse("");
-            String name = Optional.ofNullable(cm.getName()).orElse("");
-
-            boolean textMatched = name.toLowerCase().contains(filterTextField.getText()) ||
-                    series.toLowerCase().contains(filterTextField.getText());
-
-            boolean attackValid = false;
-            if (checkPhysicalAttack.isSelected() && cm.getPhysicalAttack() > 0) {
-                attackValid = true;
-            } else if (checkSpecialAttack.isSelected() && cm.getSpecialAttack() > 0) {
-                attackValid = true;
-            }
-
-
-            // 若角数匹配，则将数据添加到表格中
-            if (angleMatched && textMatched && attackValid) {
-                ImageIcon icon = ifLoadImage ? getImageFromCache(cm) : null;
-                Map<String, Object> rowData = new HashMap<>();
-                rowData.put("ID", cm.getId());
-                rowData.put("系列", cm.getSeries());
-                rowData.put("角数", cm.getAngle());
-                rowData.put("名称", cm.getName());
-                rowData.put("图片", icon);
-                rowData.put("攻击", cm.getPhysicalAttack());
-                rowData.put("特攻", cm.getSpecialAttack());
-                rowData.put("防御", cm.getDefence());
-                rowData.put("特防", cm.getSpecialDefence());
-                rowData.put("速度", cm.getSpeed());
-                rowData.put("体力", cm.getHealthPoints());
-                rowData.put("总和", cm.getSumAll());
-                rowData.put("选项总和", cm.getSumSelect());
-                addRowToTable(rowData);
+            if (isCountermarkValid(cm)) {
+                addCountermarkToTable(cm, ifLoadImage);
             }
         }
         adjustRowHeight(ifLoadImage);
+    }
+
+    /**
+     * 判断Countermark对象是否符合过滤条件。
+     *
+     * @param cm Countermark对象
+     * @return 是否符合条件
+     */
+    private boolean isCountermarkValid(Countermark cm) {
+        return isAngleValid(cm) && isTextMatched(cm) && isAttackValid(cm) && isValueValid(cm);
+    }
+
+    /**
+     * 检查Countermark对象的角数是否符合条件。
+     *
+     * @param cm Countermark对象
+     * @return 是否符合角数条件
+     */
+    private boolean isAngleValid(Countermark cm) {
+        return angleCheckBoxes.entrySet().stream()
+                .filter(e -> e.getValue().isSelected())
+                .mapToInt(e -> Integer.parseInt(e.getKey()))
+                .anyMatch(angle -> angle == cm.getAngle());
+    }
+
+    /**
+     * 检查Countermark对象的名称或系列是否与过滤文本匹配。
+     *
+     * @param cm Countermark对象
+     * @return 是否文本匹配
+     */
+    private boolean isTextMatched(Countermark cm) {
+        String series = Optional.ofNullable(cm.getSeries()).orElse("");
+        String name = Optional.ofNullable(cm.getName()).orElse("");
+        String filterText = filterTextField.getText().toLowerCase();
+        return name.toLowerCase().contains(filterText) || series.toLowerCase().contains(filterText);
+    }
+
+    /**
+     * 检查Countermark对象的攻击值是否有效。
+     *
+     * @param cm Countermark对象
+     * @return 是否攻击值有效
+     */
+    private boolean isAttackValid(Countermark cm) {
+        if (checkPhysicalAttack.isSelected() && cm.getPhysicalAttack() > 0) {
+            return true;
+        } else return checkSpecialAttack.isSelected() && cm.getSpecialAttack() > 0;
+    }
+
+    /**
+     * 检查Countermark对象的属性值是否不小于输入值。
+     *
+     * @param cm Countermark对象
+     * @return 是否符合属性值过滤条件
+     */
+    private boolean isValueValid(Countermark cm) {
+        String selectedAttribute = (String) filterCombos.getSelectedItem(); // 获取用户选择的属性
+        int requiredValue = 0;
+        try {
+            requiredValue = Integer.parseInt(valueField.getText()); // 从文本框中读取输入的值
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "请输入有效的数字");
+            return false; // 如果输入不是有效数字，直接返回false
+        }
+
+        int attributeValue = 0; // 获取对象对应属性的值
+        if (selectedAttribute != null) {
+            attributeValue = cm.getAttributeValue(selectedAttribute);
+        }
+        return attributeValue >= requiredValue; // 比较属性值是否不小于输入值
+    }
+
+
+
+
+
+
+    /**
+     * 将符合条件的Countermark对象添加到表格中。
+     *
+     * @param cm Countermark对象
+     * @param ifLoadImage 是否加载图片
+     */
+    private void addCountermarkToTable(Countermark cm, boolean ifLoadImage) {
+        ImageIcon icon = ifLoadImage ? getImageFromCache(cm) : null;
+        Map<String, Object> rowData = new HashMap<>();
+        rowData.put("ID", cm.getId());
+        rowData.put("系列", cm.getSeries());
+        rowData.put("角数", cm.getAngle());
+        rowData.put("名称", cm.getName());
+        rowData.put("图片", icon);
+        rowData.put("攻击", cm.getPhysicalAttack());
+        rowData.put("特攻", cm.getSpecialAttack());
+        rowData.put("防御", cm.getDefence());
+        rowData.put("特防", cm.getSpecialDefence());
+        rowData.put("速度", cm.getSpeed());
+        rowData.put("体力", cm.getHealthPoints());
+        rowData.put("总和", cm.getSumAll());
+        rowData.put("选项总和", cm.getSumSelect());
+        addRowToTable(rowData);
+    }
+
+    /**
+     * 将一行数据添加到表格模型中，包含刻印的属性。
+     * 该方法将刻印的属性映射到表格模型的相应列中。
+     *
+     * @param cm   数据要添加的刻印对象。
+     * @param icon 与刻印相关联的 ImageIcon，如果要显示图片的话。
+     */
+    private void addRowToTable(Countermark cm, ImageIcon icon) {
+        Vector<Object> rowData = new Vector<>();
+        rowData.add(cm.getId());
+        rowData.add(cm.getSeries());
+        rowData.add(cm.getAngle());
+        rowData.add(cm.getName());
+        rowData.add(icon);
+        rowData.add(cm.getPhysicalAttack());
+        rowData.add(cm.getSpecialAttack());
+        rowData.add(cm.getDefence());
+        rowData.add(cm.getSpecialDefence());
+        rowData.add(cm.getSpeed());
+        rowData.add(cm.getHealthPoints());
+        rowData.add(cm.getSumAll());
+        rowData.add(cm.getSumSelect());
+        tableModel.addRow(rowData);
     }
 
     /**
