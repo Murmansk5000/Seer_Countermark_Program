@@ -22,6 +22,9 @@ public class CountermarkSelectionGUI extends JFrame {
     private final int width = 10;
     // 排序选项和组合框
     String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
+
+    JCheckBox checkPhysicalAttack;
+    JCheckBox checkSpecialAttack;
     int sortTime = 6;
     JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
@@ -91,17 +94,20 @@ public class CountermarkSelectionGUI extends JFrame {
         JPanel right = new JPanel(new BorderLayout());
         JPanel checkBox = new JPanel(new BorderLayout());
 
-        checkBox.add(createAttributePanel(), BorderLayout.NORTH); // 属性面板
-        left.add(createAnglePanel(), BorderLayout.NORTH); // 选角面板
 
+        left.add(createAnglePanel(), BorderLayout.NORTH); // 选角面板
+        left.add(createAttackPanel(), BorderLayout.CENTER);
         left.add(createShowImagesCheckBox(), BorderLayout.SOUTH); // 图片勾选框
-        right.add(createSearchPanel(), BorderLayout.CENTER); // 搜索框
 
         right.add(createFilterPanel(), BorderLayout.NORTH); // 刻印名筛选
+        right.add(createSearchPanel(), BorderLayout.CENTER); // 搜索框
 
+
+        checkBox.add(createAttributePanel(), BorderLayout.NORTH); // 属性面板
         checkBox.add(left, BorderLayout.WEST);
         checkBox.add(right, BorderLayout.EAST);
         checkBox.add(createSortPanel(), BorderLayout.SOUTH);
+
         return checkBox;
     }
 
@@ -129,6 +135,15 @@ public class CountermarkSelectionGUI extends JFrame {
             addAngleBox(anglePanel, angle.getLabel(), angle.getKey(), true);
         }
         return anglePanel;
+    }
+
+    private JPanel createAttackPanel() {
+        JPanel attackPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        checkPhysicalAttack = new JCheckBox("只看物攻", true);
+        checkSpecialAttack = new JCheckBox("只看特攻", true);
+        attackPanel.add(checkPhysicalAttack);
+        attackPanel.add(checkSpecialAttack);
+        return attackPanel;
     }
 
     // 创建排序选择面板
@@ -355,9 +370,16 @@ public class CountermarkSelectionGUI extends JFrame {
             boolean textMatched = name.toLowerCase().contains(filterTextField.getText()) ||
                     series.toLowerCase().contains(filterTextField.getText());
 
+            boolean attackValid = false;
+            if (checkPhysicalAttack.isSelected()) {
+                attackValid = cm.getPhysicalAttack() > 0;
+            } else if (checkSpecialAttack.isSelected()) {
+                attackValid = cm.getSpecialAttack() > 0;
+            }
+
 
             // 若角数匹配，则将数据添加到表格中
-            if (angleMatched && textMatched) {
+            if (angleMatched && textMatched && attackValid) {
                 ImageIcon icon = ifLoadImage ? getImageFromCache(cm) : null;
                 Map<String, Object> rowData = new HashMap<>();
                 rowData.put("ID", cm.getId());
