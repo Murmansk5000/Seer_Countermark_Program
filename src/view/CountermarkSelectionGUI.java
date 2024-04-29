@@ -371,10 +371,10 @@ public class CountermarkSelectionGUI extends JFrame {
                     series.toLowerCase().contains(filterTextField.getText());
 
             boolean attackValid = false;
-            if (checkPhysicalAttack.isSelected()) {
-                attackValid = cm.getPhysicalAttack() > 0;
-            } else if (checkSpecialAttack.isSelected()) {
-                attackValid = cm.getSpecialAttack() > 0;
+            if (checkPhysicalAttack.isSelected() && cm.getPhysicalAttack() > 0) {
+                attackValid = true;
+            } else if (checkSpecialAttack.isSelected() && cm.getSpecialAttack() > 0) {
+                attackValid = true;
             }
 
 
