@@ -140,20 +140,30 @@ public class Countermark {
     public int getAttributeValue(String attributeName) {
         // 根据属性名获取属性值
         switch (attributeName) {
-            case "ID": return this.getId();
-            case "角数": return this.getAngle();
-            case "攻击": return this.getPhysicalAttack();
-            case "特攻": return this.getSpecialAttack();
-            case "防御": return this.getDefence();
-            case "特防": return this.getSpecialDefence();
-            case "速度": return this.getSpeed();
-            case "体力": return this.getHealthPoints();
-            case "总和": return this.getSumAll();
-            case "选项总和": return this.getSumSelect();
-            default: return 0; // 如果未找到匹配项，返回0
+            case "ID":
+                return this.getId();
+            case "角数":
+                return this.getAngle();
+            case "攻击":
+                return this.getPhysicalAttack();
+            case "特攻":
+                return this.getSpecialAttack();
+            case "防御":
+                return this.getDefence();
+            case "特防":
+                return this.getSpecialDefence();
+            case "速度":
+                return this.getSpeed();
+            case "体力":
+                return this.getHealthPoints();
+            case "总和":
+                return this.getSumAll();
+            case "选项总和":
+                return this.getSumSelect();
+            default:
+                return 0; // 如果未找到匹配项，返回0
         }
     }
-
 
 
 }

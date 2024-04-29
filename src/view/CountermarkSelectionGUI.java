@@ -23,10 +23,8 @@ public class CountermarkSelectionGUI extends JFrame {
     // 排序选项和组合框
     String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
     JComboBox<String> filterCombos; //筛选某项数值大于
-    private JTextField valueField; // 筛选的数值
     JCheckBox checkPhysicalAttack;
     JCheckBox checkSpecialAttack;
-
     int sortTime = 6;
     JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
@@ -35,6 +33,7 @@ public class CountermarkSelectionGUI extends JFrame {
             "攻击", "特攻", "防御", "特防", "速度", "体力",
             "总和", "选项总和"};
     int[] columnWidth = new int[columnNames.length];
+    private JTextField valueField; // 筛选的数值
     private Map<String, JCheckBox> angleCheckBoxes;
     private JCheckBox showImagesCheckBox;
     private JTable table;
@@ -146,7 +145,7 @@ public class CountermarkSelectionGUI extends JFrame {
         filterCombos = new JComboBox<>(sortOptions);
         JLabel label = new JLabel("≥");
 
-        valueField = new JTextField("0",5);  // 设置为10列宽
+        valueField = new JTextField("0", 5);  // 设置为10列宽
 
         attackPanel.add(checkPhysicalAttack);
         attackPanel.add(checkSpecialAttack);
@@ -512,14 +511,10 @@ public class CountermarkSelectionGUI extends JFrame {
     }
 
 
-
-
-
-
     /**
      * 将符合条件的Countermark对象添加到表格中。
      *
-     * @param cm Countermark对象
+     * @param cm          Countermark对象
      * @param ifLoadImage 是否加载图片
      */
     private void addCountermarkToTable(Countermark cm, boolean ifLoadImage) {
