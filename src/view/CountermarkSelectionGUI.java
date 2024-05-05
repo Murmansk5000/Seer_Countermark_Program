@@ -28,7 +28,7 @@ public class CountermarkSelectionGUI extends JFrame {
     int sortTime = 6;
     JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
-    String[] columnNames = {"ID", "角数", //"系列",
+    String[] columnNames = {"ID", "角数", "系列",
             "名称", "图片",
             "攻击", "特攻", "防御", "特防", "速度", "体力",
             "总和", "选项总和"};
@@ -410,9 +410,9 @@ public class CountermarkSelectionGUI extends JFrame {
      * @return 是否攻击值有效
      */
     private boolean isAttackValid(Countermark cm) {
-        if (checkPhysicalAttack.isSelected() && cm.getPhysicalAttack() > 0) {
-            return true;
-        } else return checkSpecialAttack.isSelected() && cm.getSpecialAttack() > 0;
+        return (checkPhysicalAttack.isSelected() && cm.getSpecialAttack() == 0)
+                || (checkSpecialAttack.isSelected() && cm.getPhysicalAttack() == 0)
+                || (checkPhysicalAttack.isSelected() && checkSpecialAttack.isSelected());
     }
 
     /**

@@ -45,7 +45,8 @@ public class CountermarkList {
                             Integer.parseInt(data[6]), // 特防
                             Integer.parseInt(data[7]), // 速度
                             Integer.parseInt(data[8]), // 体力
-                            null, imagePath);
+                            data[10], // 系列
+                            imagePath);
                     countermarks.add(cm);
                 } else {
                     System.out.println("Skipping malformed line: " + line);

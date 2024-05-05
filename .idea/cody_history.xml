@@ -4,57 +4,18 @@
     <chats>
       <list>
         <chat>
-          <internalId value="194b22b0-b3fb-4581-bda1-c84fde18e2d4" />
-          <llm>
-            <llm>
-              <model value="anthropic/claude-3-sonnet-20240229" />
-              <provider value="Anthropic" />
-              <title value="Claude 3 Sonnet" />
-            </llm>
-          </llm>
-        </chat>
-        <chat>
-          <internalId value="e8d23660-4435-4e7b-a2ee-2dbd93a22553" />
-          <llm>
-            <llm>
-              <model value="anthropic/claude-3-sonnet-20240229" />
-              <provider value="Anthropic" />
-              <title value="Claude 3 Sonnet" />
-            </llm>
-          </llm>
-        </chat>
-        <chat>
-          <internalId value="6b4b09b1-56ea-4ad9-8a76-e8bba6ade3a9" />
-          <llm>
-            <llm>
-              <model value="anthropic/claude-3-sonnet-20240229" />
-              <provider value="Anthropic" />
-              <title value="Claude 3 Sonnet" />
-            </llm>
-          </llm>
-        </chat>
-        <chat>
-          <internalId value="b2776828-4125-49c4-b7ca-ce1ba49f8d91" />
-          <llm>
-            <llm>
-              <model value="anthropic/claude-3-sonnet-20240229" />
-              <provider value="Anthropic" />
-              <title value="Claude 3 Sonnet" />
-            </llm>
-          </llm>
-        </chat>
-        <chat>
-          <internalId value="d9e9f55d-737a-4951-abbe-5f38ad3e81db" />
-          <llm>
-            <llm>
-              <model value="anthropic/claude-3-sonnet-20240229" />
-              <provider value="Anthropic" />
-              <title value="Claude 3 Sonnet" />
-            </llm>
-          </llm>
-        </chat>
-        <chat>
-          <internalId value="b6d7df7a-a55b-4ed1-ba83-db042fca15b3" />
+          <enhancedContext>
+            <enhancedContext>
+              <remoteRepositories>
+                <list>
+                  <remoteRepository>
+                    <codebaseName value="github.com/murmansk5000/seer_countermark_program" />
+                  </remoteRepository>
+                </list>
+              </remoteRepositories>
+            </enhancedContext>
+          </enhancedContext>
+          <internalId value="38cf133c-29bc-41f9-92f1-c077e208ff5d" />
           <llm>
             <llm>
               <model value="anthropic/claude-3-sonnet-20240229" />
@@ -65,6 +26,17 @@
         </chat>
       </list>
     </chats>
+    <defaultEnhancedContext>
+      <enhancedContext>
+        <remoteRepositories>
+          <list>
+            <remoteRepository>
+              <codebaseName value="github.com/murmansk5000/seer_countermark_program" />
+            </remoteRepository>
+          </list>
+        </remoteRepositories>
+      </enhancedContext>
+    </defaultEnhancedContext>
     <defaultLlm>
       <llm>
         <model value="anthropic/claude-3-sonnet-20240229" />
