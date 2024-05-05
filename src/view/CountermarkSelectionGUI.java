@@ -19,17 +19,21 @@ public class CountermarkSelectionGUI extends JFrame {
     // 界面相关的尺寸常量
     private final int height = 30;
     private final int heightWithPic = 2 * height;
-    private final int width = 10;
+    private final Map<String, ImageIcon> imageCache = new HashMap<>();
     // 排序选项和组合框
-    String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
-    JComboBox<String> filterCombos; //筛选某项数值大于
-    JCheckBox checkPhysicalAttack;
-    JCheckBox checkSpecialAttack;
-    int sortTime = 6;
-    JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
+    private final String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
+    private JComboBox<String> filterCombos; //筛选某项数值大于
+    private JCheckBox checkPhysicalAttack;
+    private JCheckBox checkSpecialAttack;
+    private final int sortTime = 6;
+    private final JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
-    String[] columnNames = {"ID", "角数", "系列",
-            "名称", "图片",
+    private final String[] columnNames = {
+            "ID",
+            "图片",
+            "角数",
+            "系列",
+            "名称",
             "攻击", "特攻", "防御", "特防", "速度", "体力",
             "总和", "选项总和"};
     int[] columnWidth = new int[columnNames.length];
@@ -40,9 +44,8 @@ public class CountermarkSelectionGUI extends JFrame {
     private DefaultTableModel tableModel;
     private JTextField searchField;
     private JTextField filterTextField;
-    private JButton searchButton;
     private int lastSearchIndex = -1; // 初始化为-1，表示开始时没有搜索过
-    private Map<String, ImageIcon> imageCache = new HashMap<>();
+
     // 复选框用于属性和角度选择
     private Map<String, JCheckBox> attributeCheckBoxes;
     // 模型和表格相关
@@ -60,9 +63,11 @@ public class CountermarkSelectionGUI extends JFrame {
     public void setWidth() {
         for (int i = 0; i < columnNames.length; i++) {
             switch (columnNames[i]) {
-                case "系列", "名称", "图片" -> columnWidth[i] = 12; // 对于“系列”、“名称”和“图片”，宽度设为8
-                case "总和", "选项总和" -> columnWidth[i] = 6; // 对于“总和”和“选项总和”，宽度设为4
-                default -> columnWidth[i] = 4; // 其他情况，默认宽度设为3
+                case "名称" -> columnWidth[i] = 150;
+                case "图片" -> columnWidth[i] = heightWithPic; // 对于“名称”和“图片”，宽度设为8
+                case "总和", "选项总和" -> columnWidth[i] = 60; // 对于“系列”、“总和”和“选项总和”，宽度设为4
+                case "系列" -> columnWidth[i] = 120;
+                default -> columnWidth[i] = 40; // 其他情况，默认宽度设为3
             }
         }
     }
@@ -120,7 +125,7 @@ public class CountermarkSelectionGUI extends JFrame {
         selectAttributeButton.addActionListener(this::selectCheckAll);
         attributePanel.add(selectAttributeButton);
         for (Attribute attribute : Attribute.values()) {
-            addAttributeBox(attributePanel, attribute.getLabel(), attribute.getKey(), true);
+            addAttributeBox(attributePanel, attribute.getLabel(), attribute.getKey());
         }
         return attributePanel;
     }
@@ -133,7 +138,7 @@ public class CountermarkSelectionGUI extends JFrame {
         selectAngleButton.addActionListener(this::selectAngleAll);
         anglePanel.add(selectAngleButton);
         for (Angle angle : Angle.values()) {
-            addAngleBox(anglePanel, angle.getLabel(), angle.getKey(), true);
+            addAngleBox(anglePanel, angle.getLabel(), angle.getKey());
         }
         return anglePanel;
     }
@@ -159,8 +164,6 @@ public class CountermarkSelectionGUI extends JFrame {
     // 创建排序选择面板
     private JPanel createSortPanel() {
         JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
-
         // 循环创建标签和组合框
         for (int i = 0; i < sortCombos.length; i++) {
             JLabel label = new JLabel("排序" + (i + 1) + ":");
@@ -186,7 +189,7 @@ public class CountermarkSelectionGUI extends JFrame {
 
     // 创建显示图片的复选框
     private JCheckBox createShowImagesCheckBox() {
-        showImagesCheckBox = new JCheckBox("显示图片");
+        showImagesCheckBox = new JCheckBox("显示图片", false);
         return showImagesCheckBox;
     }
 
@@ -246,16 +249,15 @@ public class CountermarkSelectionGUI extends JFrame {
      * @param panel        需要添加复选框的面板。
      * @param label        复选框的标签文本。
      * @param attributeKey 属性的键，用于在映射中标识复选框。
-     * @param isSelected   初始化时复选框是否被选中。
      */
-    private void addAttributeBox(JPanel panel, String label, String attributeKey, boolean isSelected) {
-        JCheckBox checkBox = new JCheckBox(label, isSelected);
+    private void addAttributeBox(JPanel panel, String label, String attributeKey) {
+        JCheckBox checkBox = new JCheckBox(label, true);
         attributeCheckBoxes.put(attributeKey, checkBox);
         panel.add(checkBox);
     }
 
-    private void addAngleBox(JPanel panel, String label, String key, boolean isSelected) {
-        JCheckBox checkBox = new JCheckBox(label, isSelected);
+    private void addAngleBox(JPanel panel, String label, String key) {
+        JCheckBox checkBox = new JCheckBox(label, true);
         angleCheckBoxes.put(key, checkBox);
         panel.add(checkBox);
     }
@@ -268,7 +270,6 @@ public class CountermarkSelectionGUI extends JFrame {
      * @param event 发生的动作事件。
      */
     private void onConfirm(ActionEvent event) {
-
         List<RowSorter.SortKey> sortKeysList = new ArrayList<>();
         for (JComboBox<String> sortCombo : sortCombos) {
             sortKeysList.add(new RowSorter.SortKey(getIndex((String) sortCombo.getSelectedItem()), SortOrder.DESCENDING));
@@ -483,7 +484,6 @@ public class CountermarkSelectionGUI extends JFrame {
      * 配置表格的数据模型、表头、列宽和文本及图片的自定义渲染器。
      */
     private void initializeTable() {
-        int width = this.width;
         tableModel = new DefaultTableModel() {
             @Override
             public Class<?> getColumnClass(int columnIndex) {
@@ -505,7 +505,7 @@ public class CountermarkSelectionGUI extends JFrame {
         tableModel.setColumnIdentifiers(columnNames);
         setWidth();
         for (int i = 0; i < columnNames.length; i++) {
-            table.getColumnModel().getColumn(i).setPreferredWidth(width * columnWidth[i]);
+            table.getColumnModel().getColumn(i).setPreferredWidth(columnWidth[i]);
         }
 
 
@@ -514,8 +514,8 @@ public class CountermarkSelectionGUI extends JFrame {
         table.setRowSorter(sorter);
 
         // 默认按照ID升序排序
-        sorter.setSortKeys(Collections.unmodifiableList(Arrays.asList(
-                new RowSorter.SortKey(0, SortOrder.ASCENDING))));
+        sorter.setSortKeys(List.of(
+                new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         sorter.sort();
 
 
@@ -584,11 +584,10 @@ public class CountermarkSelectionGUI extends JFrame {
 
 
     private ImageIcon resizeIcon(ImageIcon icon, int maxHeight) {
-        int newHeight = maxHeight;
         int newWidth = (int) Math.round(icon.getIconWidth() * ((double) maxHeight / icon.getIconHeight()));
 
         Image img = icon.getImage();
-        Image resizedImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        Image resizedImg = img.getScaledInstance(newWidth, maxHeight, Image.SCALE_SMOOTH);
         return new ImageIcon(resizedImg);
     }
 
