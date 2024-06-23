@@ -22,7 +22,8 @@ public class CountermarkSelectionGUI extends JFrame {
     private final Map<String, ImageIcon> imageCache = new HashMap<>();
     // 排序选项和组合框
     private final String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
-    private JComboBox<String> filterCombos; //筛选某项数值大于
+    private JComboBox<String> filterCombosMore; //筛选某项数值大于
+    private JComboBox<String> filterCombosLess; //筛选某项数值大于
     private JCheckBox checkPhysicalAttack;
     private JCheckBox checkSpecialAttack;
     private final int sortTime = 6;
@@ -37,7 +38,8 @@ public class CountermarkSelectionGUI extends JFrame {
             "攻击", "特攻", "防御", "特防", "速度", "体力",
             "总和", "选项总和"};
     int[] columnWidth = new int[columnNames.length];
-    private JTextField valueField; // 筛选的数值
+    private JTextField valueFieldMore; // 筛选的数值
+    private JTextField valueFieldLess; // 筛选的数值
     private Map<String, JCheckBox> angleCheckBoxes;
     private JCheckBox showImagesCheckBox;
     private JTable table;
@@ -63,11 +65,20 @@ public class CountermarkSelectionGUI extends JFrame {
     public void setWidth() {
         for (int i = 0; i < columnNames.length; i++) {
             switch (columnNames[i]) {
-                case "名称" -> columnWidth[i] = 150;
-                case "图片" -> columnWidth[i] = heightWithPic; // 对于“名称”和“图片”，宽度设为8
-                case "总和", "选项总和" -> columnWidth[i] = 60; // 对于“系列”、“总和”和“选项总和”，宽度设为4
-                case "系列" -> columnWidth[i] = 120;
-                default -> columnWidth[i] = 40; // 其他情况，默认宽度设为3
+                case "名称":
+                    columnWidth[i] = 150;
+                    break;
+                case "图片" :columnWidth[i] = heightWithPic; // 对于“名称”和“图片”，宽度设为8
+                    break;
+                case "总和":
+                    columnWidth[i] = 60; // 对于“系列”、“总和”和“选项总和”，宽度设为4
+                    break;
+                case "选项总和" :
+                    columnWidth[i] = 60; // 对于“系列”、“总和”和“选项总和”，宽度设为4
+                    break;
+                case "系列" : columnWidth[i] = 120;
+                    break;
+                default :columnWidth[i] = 40; // 其他情况，默认宽度设为3
             }
         }
     }
@@ -103,7 +114,7 @@ public class CountermarkSelectionGUI extends JFrame {
 
         left.add(createAnglePanel(), BorderLayout.NORTH); // 选角面板
         left.add(createAttackPanel(), BorderLayout.CENTER);
-        left.add(createShowImagesCheckBox(), BorderLayout.SOUTH); // 图片勾选框
+        left.add(createImagesPanel(), BorderLayout.SOUTH); // 图片勾选框
 
         right.add(createFilterPanel(), BorderLayout.NORTH); // 刻印名筛选
         right.add(createSearchPanel(), BorderLayout.CENTER); // 搜索框
@@ -147,16 +158,16 @@ public class CountermarkSelectionGUI extends JFrame {
         JPanel attackPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         checkPhysicalAttack = new JCheckBox("只看物攻", true);
         checkSpecialAttack = new JCheckBox("只看特攻", true);
-        filterCombos = new JComboBox<>(sortOptions);
+        filterCombosMore = new JComboBox<>(sortOptions);
         JLabel label = new JLabel("≥");
 
-        valueField = new JTextField("0", 5);  // 设置为10列宽
+        valueFieldMore = new JTextField("0", 5);  // 设置为10列宽
 
         attackPanel.add(checkPhysicalAttack);
         attackPanel.add(checkSpecialAttack);
-        attackPanel.add(filterCombos);
+        attackPanel.add(filterCombosMore);
         attackPanel.add(label);
-        attackPanel.add(valueField);
+        attackPanel.add(valueFieldMore);
 
         return attackPanel;
     }
@@ -191,6 +202,21 @@ public class CountermarkSelectionGUI extends JFrame {
     private JCheckBox createShowImagesCheckBox() {
         showImagesCheckBox = new JCheckBox("显示图片", false);
         return showImagesCheckBox;
+    }
+
+    private JPanel createImagesPanel() {//
+        JPanel imgPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        filterCombosLess = new JComboBox<>(sortOptions);
+        JLabel label = new JLabel("≤");
+
+        valueFieldLess = new JTextField("9999", 5);  // 设置为10列宽
+
+        imgPanel.add(createShowImagesCheckBox());
+        imgPanel.add(filterCombosLess);
+        imgPanel.add(label);
+        imgPanel.add(valueFieldLess);
+
+        return imgPanel;
     }
 
     // 创建确认按钮
@@ -423,20 +449,25 @@ public class CountermarkSelectionGUI extends JFrame {
      * @return 是否符合属性值过滤条件
      */
     private boolean isValueValid(Countermark cm) {
-        String selectedAttribute = (String) filterCombos.getSelectedItem(); // 获取用户选择的属性
-        int requiredValue;
+        String selectedAttributeMore = (String) filterCombosMore.getSelectedItem(); // 获取用户选择的属性
+        String selectedAttributeLess = (String) filterCombosLess.getSelectedItem(); // 获取用户选择的属性
+        int requiredValueMore, requiredValueLess;
         try {
-            requiredValue = Integer.parseInt(valueField.getText()); // 从文本框中读取输入的值
+            requiredValueMore = Integer.parseInt(valueFieldMore.getText()); // 从文本框中读取输入的值
+            requiredValueLess = Integer.parseInt(valueFieldLess.getText()); // 从文本框中读取输入的值
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "请输入有效的数字");
             return false; // 如果输入不是有效数字，直接返回false
         }
 
-        int attributeValue = 0; // 获取对象对应属性的值
-        if (selectedAttribute != null) {
-            attributeValue = cm.getAttributeValue(selectedAttribute);
-        }
-        return attributeValue >= requiredValue; // 比较属性值是否不小于输入值
+        int attributeValueMore = (selectedAttributeMore != null) ? cm.getAttributeValue(selectedAttributeMore) : 0;
+        int attributeValueLess = (selectedAttributeLess != null) ? cm.getAttributeValue(selectedAttributeLess) : 0;
+
+        boolean isAttributeValueMoreValid = attributeValueMore >= requiredValueMore;
+        boolean isAttributeValueLessValid = attributeValueLess < requiredValueLess;
+
+        return isAttributeValueMoreValid && isAttributeValueLessValid;
+
     }
 
 
@@ -514,9 +545,10 @@ public class CountermarkSelectionGUI extends JFrame {
         table.setRowSorter(sorter);
 
         // 默认按照ID升序排序
-        sorter.setSortKeys(List.of(
+        sorter.setSortKeys(Collections.singletonList(
                 new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         sorter.sort();
+
 
 
         // 自定义单元格渲染器，用于文本居中和调整字体大小
