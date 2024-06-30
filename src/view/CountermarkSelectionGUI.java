@@ -464,7 +464,7 @@ public class CountermarkSelectionGUI extends JFrame {
         int attributeValueLess = (selectedAttributeLess != null) ? cm.getAttributeValue(selectedAttributeLess) : 0;
 
         boolean isAttributeValueMoreValid = attributeValueMore >= requiredValueMore;
-        boolean isAttributeValueLessValid = attributeValueLess < requiredValueLess;
+        boolean isAttributeValueLessValid = attributeValueLess <= requiredValueLess;
 
         return isAttributeValueMoreValid && isAttributeValueLessValid;
 
