@@ -22,10 +22,6 @@ public class CountermarkSelectionGUI extends JFrame {
     private final Map<String, ImageIcon> imageCache = new HashMap<>();
     // 排序选项和组合框
     private final String[] sortOptions = {"选项总和", "总和", "攻击", "特攻", "防御", "特防", "速度", "体力"};
-    private JComboBox<String> filterCombosMore; //筛选某项数值大于
-    private JComboBox<String> filterCombosLess; //筛选某项数值大于
-    private JCheckBox checkPhysicalAttack;
-    private JCheckBox checkSpecialAttack;
     private final int sortTime = 6;
     private final JComboBox<String>[] sortCombos = new JComboBox[sortTime]; // 创建一个组合框数组
     // 表格的列数
@@ -38,6 +34,10 @@ public class CountermarkSelectionGUI extends JFrame {
             "攻击", "特攻", "防御", "特防", "速度", "体力",
             "总和", "选项总和"};
     int[] columnWidth = new int[columnNames.length];
+    private JComboBox<String> filterCombosMore; //筛选某项数值大于
+    private JComboBox<String> filterCombosLess; //筛选某项数值大于
+    private JCheckBox checkPhysicalAttack;
+    private JCheckBox checkSpecialAttack;
     private JTextField valueFieldMore; // 筛选的数值
     private JTextField valueFieldLess; // 筛选的数值
     private Map<String, JCheckBox> angleCheckBoxes;
@@ -68,17 +68,20 @@ public class CountermarkSelectionGUI extends JFrame {
                 case "名称":
                     columnWidth[i] = 150;
                     break;
-                case "图片" :columnWidth[i] = heightWithPic; // 对于“名称”和“图片”，宽度设为8
+                case "图片":
+                    columnWidth[i] = heightWithPic; // 对于“名称”和“图片”，宽度设为8
                     break;
                 case "总和":
                     columnWidth[i] = 60; // 对于“系列”、“总和”和“选项总和”，宽度设为4
                     break;
-                case "选项总和" :
+                case "选项总和":
                     columnWidth[i] = 60; // 对于“系列”、“总和”和“选项总和”，宽度设为4
                     break;
-                case "系列" : columnWidth[i] = 120;
+                case "系列":
+                    columnWidth[i] = 120;
                     break;
-                default :columnWidth[i] = 40; // 其他情况，默认宽度设为3
+                default:
+                    columnWidth[i] = 40; // 其他情况，默认宽度设为3
             }
         }
     }
@@ -437,9 +440,10 @@ public class CountermarkSelectionGUI extends JFrame {
      * @return 是否攻击值有效
      */
     private boolean isAttackValid(Countermark cm) {
-        return (checkPhysicalAttack.isSelected() && cm.getSpecialAttack() == 0)
-                || (checkSpecialAttack.isSelected() && cm.getPhysicalAttack() == 0)
-                || (checkPhysicalAttack.isSelected() && checkSpecialAttack.isSelected());
+        return (checkPhysicalAttack.isSelected() && cm.getPhysicalAttack() > 0)
+                || (checkSpecialAttack.isSelected() && cm.getSpecialAttack() > 0)
+//                || (checkPhysicalAttack.isSelected() && checkSpecialAttack.isSelected())
+                || cm.getPhysicalAttack() == 0 && cm.getSpecialAttack() == 0;
     }
 
     /**
@@ -548,7 +552,6 @@ public class CountermarkSelectionGUI extends JFrame {
         sorter.setSortKeys(Collections.singletonList(
                 new RowSorter.SortKey(0, SortOrder.ASCENDING)));
         sorter.sort();
-
 
 
         // 自定义单元格渲染器，用于文本居中和调整字体大小

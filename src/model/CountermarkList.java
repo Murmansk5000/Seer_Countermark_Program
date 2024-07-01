@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.*;
 
 public class CountermarkList {
-    private ArrayList<Countermark> countermarks;
+    private final ArrayList<Countermark> countermarks;
 
     public CountermarkList() {
         this.countermarks = new ArrayList<>();
